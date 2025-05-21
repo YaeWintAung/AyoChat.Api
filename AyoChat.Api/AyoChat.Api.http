@@ -1,0 +1,6 @@
+@AyoChat.Api_HostAddress = http://localhost:5068
+
+GET {{AyoChat.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
