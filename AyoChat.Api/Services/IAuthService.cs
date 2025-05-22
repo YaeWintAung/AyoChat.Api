@@ -10,5 +10,7 @@ namespace AyoChat.Api.Services
         Task<LoginResponseDto?> LoginAsync(UserLoginRequestDto request);
 
         Task<LoginResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request);
+
+        Task<User?> GetLoggedUser(Guid userId);
     }
 }

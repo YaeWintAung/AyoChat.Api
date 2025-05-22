@@ -118,5 +118,10 @@ namespace AyoChat.Api.Services
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
+
+        public async Task<User?> GetLoggedUser(Guid userId)
+        {
+            return await context.Users.FindAsync(userId);
+        }
     }
 }

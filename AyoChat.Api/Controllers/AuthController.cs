@@ -1,8 +1,10 @@
 ﻿using AyoChat.Api.Entities;
 using AyoChat.Api.Models;
 using AyoChat.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AyoChat.Api.Controllers
 {
@@ -33,6 +35,17 @@ namespace AyoChat.Api.Controllers
             var result = await authService.RefreshTokenAsync(request);
             if (result is null || result.RefreshToken is null || result.AccessToken is null ) return BadRequest("Invalid refresh token");
             return Ok(result);
-        }   
+        }
+
+        [Authorize]
+        [HttpPost("me")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            var currentUserIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+            var user = await authService.GetLoggedUser(currentUserId);
+            return Ok(user);
+        }
     }
 }
