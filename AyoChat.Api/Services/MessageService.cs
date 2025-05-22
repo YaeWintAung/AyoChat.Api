@@ -7,12 +7,23 @@ using System.Linq;
 
 namespace AyoChat.Api.Services
 {
-    public class MessageService(ChatDbContext context,ChatHub chatHub) : IMessageService
+    public class MessageService(ChatDbContext context,IHubContext<ChatHub> chatHub) : IMessageService
     {
+        public async Task<List<Message>> GetMessagesWithUser(Guid currentUserId, Guid withUserId)
+        {
+            var messages = await context.Messages
+                    .Where(m => (m.SenderId == currentUserId && m.ReceiverId == withUserId)
+                             || (m.SenderId == withUserId && m.ReceiverId == currentUserId))
+                    .OrderBy(m => m.CreatedAt)
+                    .ToListAsync();
+            
+            return messages;
+        }
+
         public async Task SendMessageAsync(Guid senderId, Guid receiverId, string content)
         {
-            var sender = await context.Users.FirstOrDefaultAsync(u=>u.Id == senderId);
-            var receiver = await context.Users.FirstOrDefaultAsync(u=>u.Id == receiverId);
+            var sender = await context.Users.FindAsync(senderId);
+            var receiver = await context.Users.FindAsync(receiverId);
             if (sender == null || receiver == null)
                 throw new Exception("Sender or receiver not found");
 
