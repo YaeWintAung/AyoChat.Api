@@ -3,7 +3,6 @@ using AyoChat.Api.Entities;
 using AyoChat.Api.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace AyoChat.Api.Services
 {
@@ -40,9 +39,7 @@ namespace AyoChat.Api.Services
             context.Messages.Add(message);
             await context.SaveChangesAsync();
 
-            await chatHub.Clients.All.SendAsync("ReceiveMessage",senderId.ToString(),content);
-            //await chatHub.Clients.Group(receiverId.ToString()).SendAsync("ReceiveMessage",senderId.ToString(),content);
-
+            await chatHub.Clients.Group(receiverId.ToString()).SendAsync("ReceiveMessage",senderId.ToString(), receiver.ToString(), content);
         }
     }
 }
