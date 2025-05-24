@@ -2,16 +2,16 @@
 
 namespace AyoChat.Api.Hubs
 {
-    public class ChatHub: Hub
+    public class ChatHub: Hub<IChatHub>
     {
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             var userId = Context.UserIdentifier;
             if (!string.IsNullOrEmpty(userId))
             {
-                Groups.AddToGroupAsync(Context.ConnectionId, userId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, userId);
             }
-            return base.OnConnectedAsync();
+            await Clients.All.ReceiveMessage($"Thank you for connection {Context.User?.Identity?.Name}");
         }
 
         public async Task SendMessage(string receiverId,string message)
@@ -19,8 +19,14 @@ namespace AyoChat.Api.Hubs
             var senderId = Context.UserIdentifier;
             if (!string.IsNullOrEmpty(senderId))
             {
-                await Clients.Group(receiverId).SendAsync("ReceiveMessage", senderId, message);
+                await Clients.Group(receiverId).ReceiveMessage(senderId, message);
             }
         }
+    }
+
+    public interface IChatHub
+    {
+        Task ReceiveMessage(string message);
+        Task ReceiveMessage(string senderId, string message);
     }
 }
