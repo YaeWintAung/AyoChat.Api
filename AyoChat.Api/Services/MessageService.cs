@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AyoChat.Api.Services
 {
-    public class MessageService(ChatDbContext context,IHubContext<ChatHub> chatHub) : IMessageService
+    public class MessageService(ChatDbContext context,IHubContext<ChatHub,IChatHub> chatHub) : IMessageService
     {
         public async Task<List<Message>> GetMessagesWithUser(Guid currentUserId, Guid withUserId)
         {
@@ -39,7 +39,7 @@ namespace AyoChat.Api.Services
             context.Messages.Add(message);
             await context.SaveChangesAsync();
 
-            await chatHub.Clients.Group(receiverId.ToString()).SendAsync("ReceiveMessage",senderId.ToString(), content);
+            await chatHub.Clients.Group(receiverId.ToString()).ReceiveMessage(senderId.ToString(), content);
         }
     }
 }
