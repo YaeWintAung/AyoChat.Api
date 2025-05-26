@@ -39,7 +39,7 @@ namespace AyoChat.Api.Services
             context.Messages.Add(message);
             await context.SaveChangesAsync();
 
-            await chatHub.Clients.Group(receiverId.ToString()).SendAsync("ReceiveMessage",senderId.ToString(), receiverId.ToString(), content);
+            await chatHub.Clients.Group(receiverId.ToString()).SendAsync("ReceiveMessage",senderId.ToString(), content);
         }
     }
 }
