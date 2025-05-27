@@ -18,7 +18,8 @@ namespace AyoChat.Api.Controllers
             var senderIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(senderIdStr, out var senderId))
                 return Unauthorized();
-            await messageService.SendMessageAsync(senderId, req.ReceiverId, req.Content);
+            bool sent = await messageService.SendMessageAsync(senderId, req.ReceiverId, req.Content);
+            if(!sent) return BadRequest(new { Message = "Failed to send message" });
             return Ok(new { Message = "Message sent successfully" });
         }
 

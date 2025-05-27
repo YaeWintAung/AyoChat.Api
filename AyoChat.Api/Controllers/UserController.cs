@@ -1,7 +1,9 @@
 ﻿using AyoChat.Api.Entities;
+using AyoChat.Api.Hubs;
 using AyoChat.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AyoChat.Api.Controllers
 {
@@ -28,6 +30,21 @@ namespace AyoChat.Api.Controllers
         {
             var user = await userService.GetUserByPhone(phone);
             return Ok(user);
+        }
+
+        [HttpGet("/status")]
+        public async Task<IActionResult> GetStatus()
+        {
+            var users = await userService.GetUsers();
+            var onlineIds = ConnectedUsers.OnlineUsers.Values.ToHashSet();
+            var userStatuses = users.Select(u => new
+            {
+                u.Id,
+                u.Username,
+                IsOnline = onlineIds.Contains(u.Id.ToString()),
+                u.LastSeen
+            });
+            return Ok("User service is running");
         }
     }
 }

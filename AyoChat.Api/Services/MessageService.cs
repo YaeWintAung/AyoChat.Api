@@ -19,12 +19,12 @@ namespace AyoChat.Api.Services
             return messages;
         }
 
-        public async Task SendMessageAsync(Guid senderId, Guid receiverId, string content)
+        public async Task<bool> SendMessageAsync(Guid senderId, Guid receiverId, string content)
         {
             var sender = await context.Users.FindAsync(senderId);
             var receiver = await context.Users.FindAsync(receiverId);
             if (sender == null || receiver == null)
-                throw new Exception("Sender or receiver not found");
+                return false;
 
             var message = new Message
             {
@@ -39,7 +39,10 @@ namespace AyoChat.Api.Services
             context.Messages.Add(message);
             await context.SaveChangesAsync();
 
-            await chatHub.Clients.Group(receiverId.ToString()).ReceiveMessage(senderId.ToString(), content);
+            //await chatHub.Clients.Group(receiverId.ToString()).ReceiveMessage(senderId.ToString(), content);
+            await chatHub.Clients.All.ReceiveMessage(senderId.ToString(), content);
+            return true;
         }
+
     }
 }
