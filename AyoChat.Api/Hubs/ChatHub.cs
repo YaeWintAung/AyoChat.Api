@@ -20,7 +20,7 @@ namespace AyoChat.Api.Hubs
                 var onlineUserIds = ConnectedUsers.OnlineUsers.Values.Distinct().ToList();
                 await Clients.Caller.ReceiveOnlineUsers(onlineUserIds);
             }
-            await Clients.All.ReceiveMessage($"Thank you for connection {Context.User?.Identity?.Name}");
+            await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -54,7 +54,6 @@ namespace AyoChat.Api.Hubs
 
     public interface IChatHub
     {
-        Task ReceiveMessage(string message);
         Task ReceiveMessage(string senderId, string message);
         Task ReceiveOnlineStatus(string userId, bool isOnline);
         Task ReceiveOnlineUsers(List<string> onlineUserIds);
